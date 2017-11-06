@@ -1,0 +1,68 @@
+---
+title: "Unit 11 Online Lecture Assignment"
+author: "Jeremy Lubich"
+date: "November 6, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tseries)
+
+```
+
+## Downloading data for my company: Unisys (UIS)
+
+```{r }
+SNPdata <- get.hist.quote('UIS', quote="Close")
+```
+
+## Calculating Log Returns
+
+```{r }
+SNPret <- log(lag(SNPdata)) - log(SNPdata)
+```
+
+## Calculating the Volitility Measure
+
+```{r }
+SNPvol <- sd(SNPret) * sqrt(250) * 100
+SNPvol
+```
+
+## Creating the Volitilty Function for the series
+
+```{r}
+Vol <- function(d, logrets) {
+  var = 0
+  lam = 0
+  varlist <- c()
+  for (r in logrets) {
+    lam = lam * (1 - 1/d) + 1
+    var = (1 - 1/lam) * var + (1/lam) * r^2
+    varlist <- c(varlist, var)
+  }
+  sqrt(varlist)
+}
+```
+
+## Calculate volatility over entire length of series for various three different decay factors
+
+```{r}
+
+voltest <- Vol(10, SNPret)
+voltest2 <- Vol(30, SNPret)
+voltest3 <- Vol(100, SNPret)
+
+```
+
+## Plot the results, overlaying the volatility curves on the data
+
+```{r}
+
+plot(voltest, type = "l")
+lines(voltest2, type = "l", col = "red")
+lines(voltest3, type = "l", col = "blue")
+
+
+```
